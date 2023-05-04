@@ -77,9 +77,16 @@ app.get("/contact",function(req,res){
     contactcontent:contactContent
   });
 });
+
 app.get("/compose",function(req,res){
   res.render("compose.ejs")
 });
+
+// to render the login page
+
+app.get("/login",function(req,res){
+  res.render("login.ejs");
+})
 app.post("/compose",function(req,res)
 {
   const journalEntry=new Journal({

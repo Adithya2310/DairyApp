@@ -47,6 +47,10 @@ input{
     margin-bottom: 20px;
 }
 
+.text-teal{
+color: #1abc9c;
+}
+
 .btn-teal{
     background-color: #1abc9c;
     color: aliceblue;
