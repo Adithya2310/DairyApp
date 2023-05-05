@@ -32,7 +32,7 @@ app.use(passport.session());
 
 mongoose.set('strictQuery',false);
 
-mongoose.connect("mongodb+srv://adithya_n_g:Alluarjunfan@cluster0.ejmaaoq.mongodb.net/journalDB", {useNewUrlParser: true});
+mongoose.connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.ejmaaoq.mongodb.net/journalDB`, {useNewUrlParser: true});
 
 const userSchema= new mongoose.Schema({
   googleId: String,
