@@ -4,7 +4,7 @@
     <h1>Login</h1>
     <div class="row">
         <div class="col-sm-8">
-            <div class="card">
+            <div class="card register-card">
                 <div class="card-body">
                     <form action="/login" method="post">
                         <div class="form-group">
@@ -20,6 +20,24 @@
                 </div>
             </div>
         </div>
+        <div class="col-sm-4">
+            <div class="card social-block">
+              <div class="card-body">
+                <a class="btn btn-block btn-facebook" href="/auth/facebook" role="button">
+                  <i class="fab fa-facebook-f"></i>
+                  <span>Log in with Facebook</span>
+                </a>
+              </div>
+            </div>
+            <div class="card social-block">
+              <div class="card-body">
+                <a class="btn btn-block btn-google" href="/auth/google" role="button">
+                  <i class="fab fa-google"></i>
+                  Log in with Google
+                </a>
+              </div>
+            </div>
+          </div>
     </div>
 </div>
 <%- include('partials/footer') %>

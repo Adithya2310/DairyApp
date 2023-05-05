@@ -35,8 +35,8 @@ mongoose.set('strictQuery',false);
 mongoose.connect("mongodb+srv://adithya_n_g:Alluarjunfan@cluster0.ejmaaoq.mongodb.net/journalDB", {useNewUrlParser: true});
 
 const userSchema= new mongoose.Schema({
-  googleID: String,
-  facebookID: String,
+  googleId: String,
+  facebookId: String,
   titleText: [String],
   postText: [String]
 });
@@ -72,12 +72,12 @@ passport.deserializeUser(function(id,done){
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/auth/google/secrets",
+  callbackURL: "http://localhost:3000/auth/google/diary",
   userProfileURL: 'https://www.googleapis.com/oauth2/v3/userinfo'
 },
 function(accessToken, refreshToken, profile, cb) {
   console.log(profile);
-  user.findOrCreate({ googleId: profile.id }, function (err, user) {
+  user.findOrCreate({ googleId: profile.id,username: profile.displayName }, function (err, user) {
     return cb(err, user);
   });
 }
@@ -86,11 +86,11 @@ function(accessToken, refreshToken, profile, cb) {
 passport.use(new FacebookStrategy({
   clientID: process.env.FB_APP_ID,
   clientSecret: process.env.FB_APP_SECRET,
-  callbackURL: "http://localhost:3000/auth/facebook/secrets"
+  callbackURL: "http://localhost:3000/auth/facebook/diary"
 },
 function(accessToken, refreshToken, profile, cb) {
   console.log(profile);
-  user.findOrCreate({ facebookId: profile.id }, function (err, user) {
+  user.findOrCreate({ facebookId: profile.id,username: profile.displayName }, function (err, user) {
     return cb(err, user);
   });
 }
@@ -128,6 +128,30 @@ app.get("/login",function(req,res){
 
 app.get("/register",function(req,res){
   res.render("register.ejs");
+});
+
+
+// for google authentiation
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile'] }));
+
+app.get('/auth/google/diary', 
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    res.redirect('/diary');
+  });
+
+  // for authenctication with facebook
+
+app.get('/auth/facebook',
+passport.authenticate('facebook'));
+
+app.get('/auth/facebook/diary',
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    res.redirect('/diary');
 });
 
 app.get("/diary",function(req,res){
@@ -197,7 +221,7 @@ app.post("/register",function(req,res){
     }
     else{
       passport.authenticate("local")(req,res,function(){
-        res.redirect("/compose");
+        res.redirect("/diary");
       });
     }
   });
@@ -214,7 +238,7 @@ app.post("/login",function(req,res){
       }
       else{
           passport.authenticate("local")(req,res,function(){
-              res.redirect("/about");
+              res.redirect("/diary");
           });
       }
   });
@@ -241,6 +265,15 @@ app.post("/compose",function(req,res)
   })
 });
 
+//to logout
+app.get("/logout",function(req,res){
+  req.logout(function(err){
+    if(err){
+      console.log(err);
+    }
+  });
+  res.redirect("/");
+})
 
 app.listen(process.env.PORT || 3000, function() {
   console.log("Server started on port 3000");

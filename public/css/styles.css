@@ -1,3 +1,7 @@
+body {
+    background-color: #E8ECEF;
+  }
+
 .container-fluid {
     padding-top: 70px;
     padding-bottom: 70px;
@@ -11,8 +15,16 @@
     font-size: 12px;
     letter-spacing: 5px;
 }
-.navbar-nav  li a:hover {
+.navbar-nav li a:hover {
     color: #1abc9c !important;
+}
+
+
+.navbar-list{
+    display: flex !important;
+    flex-direction: row;
+    gap: 2rem;
+    color: rgb(17,17,17);
 }
 
 .home-contianer{
@@ -27,6 +39,8 @@
 .footer-padding {
 	padding-bottom: 60px;
 }
+
+
 
 .footer {
     position: fixed;
@@ -70,5 +84,54 @@ color: #1abc9c;
     border-color: rgb(17,17,17);
     border-radius: 10px;
 }
+
+/* styling google button */
+.btn-google {
+    display: inline-block;
+    background-color: #4285F4;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px 24px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+  }
+  .btn-google i {
+    display: inline-block;
+    font-size: 16px;
+    margin-right: 12px;
+  
+  }
+  .btn-google:hover {
+    background-color: #3075B8;
+  }
+
+
+  /* styling for facebook button */
+  .btn-facebook {
+    display: inline-block;
+    background-color: #3b5998;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px 24px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+  }
+  .btn-facebook:hover {
+    background-color: #2d4373;
+  }
+  .btn-facebook i {
+    display: inline-block;
+    font-size: 16px;
+    margin-right: 12px;
+    vertical-align: middle;
+  }
+  .btn-facebook span {
+    display: inline-block;
+    vertical-align: middle;
+  }
 
 
