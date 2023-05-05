@@ -1,4 +1,5 @@
 
+require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
@@ -7,6 +8,11 @@ const mongoose=require('mongoose');
 const session=require('express-session');
 const passport=require('passport');
 const passportLocalMongoose=require('passport-local-mongoose');
+var GoogleStrategy = require('passport-google-oauth20').Strategy;
+const FacebookStrategy=require('passport-facebook').Strategy;
+const findOrCreate = require('mongoose-findorcreate');
+
+
 
 const app = express();
 app.set('view engine', 'ejs');
@@ -28,12 +34,68 @@ mongoose.set('strictQuery',false);
 
 mongoose.connect("mongodb+srv://adithya_n_g:Alluarjunfan@cluster0.ejmaaoq.mongodb.net/journalDB", {useNewUrlParser: true});
 
-const journalSchema=new mongoose.Schema({
-    titleText: String,
-    postText: String
+const userSchema= new mongoose.Schema({
+  googleID: String,
+  facebookID: String,
+  titleText: [String],
+  postText: [String]
 });
 
-const Journal=mongoose.model("Journal",journalSchema);
+userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(findOrCreate);
+
+const user=mongoose.model("User",userSchema);
+
+passport.use(user.createStrategy());
+
+// serializing 
+passport.serializeUser(function(user,done){
+  done(null,user.id);
+});
+
+passport.deserializeUser(function(id,done){
+  user.findById(id,function(err,user){
+    done(err,user);
+  })
+})
+
+
+// const journalSchema=new mongoose.Schema({
+//     googleID: String,
+//     facebookID:String,
+//     titleText: String,
+//     postText: String
+// });
+
+// const Journal=mongoose.model("Journal",journalSchema);
+
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: "http://localhost:3000/auth/google/secrets",
+  userProfileURL: 'https://www.googleapis.com/oauth2/v3/userinfo'
+},
+function(accessToken, refreshToken, profile, cb) {
+  console.log(profile);
+  user.findOrCreate({ googleId: profile.id }, function (err, user) {
+    return cb(err, user);
+  });
+}
+));
+
+passport.use(new FacebookStrategy({
+  clientID: process.env.FB_APP_ID,
+  clientSecret: process.env.FB_APP_SECRET,
+  callbackURL: "http://localhost:3000/auth/facebook/secrets"
+},
+function(accessToken, refreshToken, profile, cb) {
+  console.log(profile);
+  user.findOrCreate({ facebookId: profile.id }, function (err, user) {
+    return cb(err, user);
+  });
+}
+));
+
 
 const homeStartingContent = "Lacus vel facilisis volutpat est velit egestas dui id ornare. Semper auctor neque vitae tempus quam. Sit amet cursus sit amet dictum sit amet justo. Viverra tellus in hac habitasse. Imperdiet proin fermentum leo vel orci porta. Donec ultrices tincidunt arcu non sodales neque sodales ut. Mattis molestie a iaculis at erat pellentesque adipiscing. Magnis dis parturient montes nascetur ridiculus mus mauris vitae ultricies. Adipiscing elit ut aliquam purus sit amet luctus venenatis lectus. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Odio euismod lacinia at quis risus sed vulputate odio ut. Cursus mattis molestie a iaculis at erat pellentesque adipiscing.";
 const aboutContent = "Hac habitasse platea dictumst vestibulum rhoncus est pellentesque. Dictumst vestibulum rhoncus est pellentesque elit ullamcorper. Non diam phasellus vestibulum lorem sed. Platea dictumst quisque sagittis purus sit. Egestas sed sed risus pretium quam vulputate dignissim suspendisse. Mauris in aliquam sem fringilla. Semper risus in hendrerit gravida rutrum quisque non tellus orci. Amet massa vitae tortor condimentum lacinia quis vel eros. Enim ut tellus elementum sagittis vitae. Mauris ultrices eros in cursus turpis massa tincidunt dui.";
@@ -57,17 +119,46 @@ app.get("/",function(req,res){
   // });
 });
 
+
+// to render the login page
+
+app.get("/login",function(req,res){
+  res.render("login.ejs");
+});
+
+app.get("/register",function(req,res){
+  res.render("register.ejs");
+});
+
+app.get("/diary",function(req,res){
+  user.findById(req.user.id,function(err,foundUser){
+    if(err){
+      console.log(err);
+    }
+    else
+    {
+      res.render("diary.ejs",{
+        homestartingcontent:homeStartingContent,
+        titleText:foundUser.titleText,
+        postText:foundUser.postText
+      });
+    }
+  })
+})
+
 app.get("/posts/:title",function(req,res){
   const title=req.params.title;
   console.log(title);
-  Journal.find({titleText: title},function(err,result){
+  user.findById(req.user.id,function(err,foundUser){
     if(err){
       console.log(err);
     }
     else{
+      let index=foundUser.titleText.indexOf(title);
       res.render('post.ejs',{
-        post: result[0]
-      })
+        postText: foundUser.postText[index],
+        titleText: foundUser.titleText[index]
+      });
     }
   });
   // for(var i=0;i<post.length;i++)
@@ -96,28 +187,61 @@ app.get("/compose",function(req,res){
   res.render("compose.ejs")
 });
 
-// to render the login page
+// to register the user
 
-app.get("/login",function(req,res){
-  res.render("login.ejs");
+app.post("/register",function(req,res){
+  user.register({username:req.body.username},req.body.password,function(err,user){
+    if(err){
+      console.log(err);
+      res.redirect("/register");
+    }
+    else{
+      passport.authenticate("local")(req,res,function(){
+        res.redirect("/compose");
+      });
+    }
+  });
 });
 
-app.get("/register",function(req,res){
-  res.render("register.ejs");
+app.post("/login",function(req,res){
+  const User=new user({
+      username: req.body.username,
+      password: req.body.password
+  });
+  req.login(User,function(err){
+      if(err){
+          console.log(err);
+      }
+      else{
+          passport.authenticate("local")(req,res,function(){
+              res.redirect("/about");
+          });
+      }
+  });
 });
 
 app.post("/compose",function(req,res)
 {
-  const journalEntry=new Journal({
-    titleText: req.body.titleText,
-    postText: req.body.postText
-  });
-  journalEntry.save(function(err){
-    if(!err){
-      res.redirect("/");
+  console.log(req.body);
+  const titleText=req.body.titleText;
+  const postText=req.body.postText;
+  user.findById(req.user.id,function(err,foundUser){
+    if(err){
+      console.log(err);
     }
-  });
+    else{
+      if(foundUser){
+        foundUser.titleText.push(titleText);
+        foundUser.postText.push(postText);
+        foundUser.save();
+        console.log("the saved user is",foundUser);
+        res.send("saved succesfully");
+      }
+    }
+  })
 });
+
+
 app.listen(process.env.PORT || 3000, function() {
   console.log("Server started on port 3000");
 });
