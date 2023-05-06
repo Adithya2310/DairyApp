@@ -72,7 +72,7 @@ passport.deserializeUser(function(id,done){
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/auth/google/diary",
+  callbackURL: process.env.GOOGLE_CALLBACK_URL,
   userProfileURL: 'https://www.googleapis.com/oauth2/v3/userinfo'
 },
 function(accessToken, refreshToken, profile, cb) {
@@ -86,7 +86,7 @@ function(accessToken, refreshToken, profile, cb) {
 passport.use(new FacebookStrategy({
   clientID: process.env.FB_APP_ID,
   clientSecret: process.env.FB_APP_SECRET,
-  callbackURL: "http://localhost:3000/auth/facebook/diary"
+  callbackURL: process.env.FACEBOOK_CALLBACK_URL
 },
 function(accessToken, refreshToken, profile, cb) {
   console.log(profile);
@@ -97,8 +97,8 @@ function(accessToken, refreshToken, profile, cb) {
 ));
 
 
-const homeStartingContent = "Lacus vel facilisis volutpat est velit egestas dui id ornare. Semper auctor neque vitae tempus quam. Sit amet cursus sit amet dictum sit amet justo. Viverra tellus in hac habitasse. Imperdiet proin fermentum leo vel orci porta. Donec ultrices tincidunt arcu non sodales neque sodales ut. Mattis molestie a iaculis at erat pellentesque adipiscing. Magnis dis parturient montes nascetur ridiculus mus mauris vitae ultricies. Adipiscing elit ut aliquam purus sit amet luctus venenatis lectus. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Odio euismod lacinia at quis risus sed vulputate odio ut. Cursus mattis molestie a iaculis at erat pellentesque adipiscing.";
-const aboutContent = "Hac habitasse platea dictumst vestibulum rhoncus est pellentesque. Dictumst vestibulum rhoncus est pellentesque elit ullamcorper. Non diam phasellus vestibulum lorem sed. Platea dictumst quisque sagittis purus sit. Egestas sed sed risus pretium quam vulputate dignissim suspendisse. Mauris in aliquam sem fringilla. Semper risus in hendrerit gravida rutrum quisque non tellus orci. Amet massa vitae tortor condimentum lacinia quis vel eros. Enim ut tellus elementum sagittis vitae. Mauris ultrices eros in cursus turpis massa tincidunt dui.";
+const homeStartingContent = "Welcome to Your Diary, the perfect place to capture your thoughts and memories. With our simple and easy to use designed interface, you can easily compose and organize your entries, giving you the freedom to reflect on your personal journey. Whether you want to document your daily life or special moments, Your Diary is the perfect tool to help you preserve your memories and emotions. With our app, you can look back on your experiences and see how far you've come. Start writing today and begin your journey of self-reflection and growth.";
+const aboutContent = "Welcome to Your Diary,this is a digital diary app developed by Adithya N G using Express, Node and MongoDB to implement and imporve my backend skills. The front-end of our app was built using EJS templates.I started it in january of 2023, I recently have improvised it by adding user Authentication and other necessary  functionalities. ";
 const contactContent = "Scelerisque eleifend donec pretium vulputate sapien. Rhoncus urna neque viverra justo nec ultrices. Arcu dui vivamus arcu felis bibendum. Consectetur adipiscing elit duis tristique. Risus viverra adipiscing at in tellus integer feugiat. Sapien nec sagittis aliquam malesuada bibendum arcu vitae. Consequat interdum varius sit amet mattis. Iaculis nunc sed augue lacus. Interdum posuere lorem ipsum dolor sit amet consectetur adipiscing elit. Pulvinar elementum integer enim neque. Ultrices gravida dictum fusce ut placerat orci nulla. Mauris in aliquam sem fringilla ut morbi tincidunt. Tortor posuere ac ut consequat semper viverra nam libero.";
 
 app.get("/",function(req,res){
@@ -259,7 +259,7 @@ app.post("/compose",function(req,res)
         foundUser.postText.push(postText);
         foundUser.save();
         console.log("the saved user is",foundUser);
-        res.send("saved succesfully");
+        res.redirect("/diary");
       }
     }
   })

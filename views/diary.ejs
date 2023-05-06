@@ -1,9 +1,9 @@
 <%- include("partials/navbar.ejs") -%>
-<h1>Home</h1>
-<p><%= homestartingcontent %></p>
+<h2 class="my-4">Home</h2>
+<p class="pb-5" style="line-height: 2;"><%= homestartingcontent %></p>
 <% for(var i=0; i<titleText.length;i++) { %>
-    <h1><%= titleText[i] %></h1>
-    <p> <%= postText[i].substring(0,50) + "..." %>
-    <a href="/posts/<%= titleText[i] %>"> readmore</a> </p>
+    <h3 class="my-1"><%= titleText[i] %></h3>
+    <p class="my-3" style="line-height: 1.5;"><%= postText[i].substring(0,50) + "..." %>
+    <a href="/posts/<%= titleText[i] %>">readmore</a> </p>
 <% } %>
 <%- include("partials/footer.ejs") -%>

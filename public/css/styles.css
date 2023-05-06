@@ -74,6 +74,10 @@ input{
 color: #1abc9c;
 }
 
+.text-gray{
+  color: rgb(18, 18, 18);
+}
+
 .btn-teal{
     background-color: #1abc9c;
     color: aliceblue;
