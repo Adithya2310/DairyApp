@@ -15,7 +15,7 @@ To get started with the application, follow these steps:
 3) Create a .env file in the root directory of the project and add the connection of your mongoDB Database 
 -MONGO_URI: the MongoDB connection string
 -SESSION_SECRET: a secret string used to sign session cookies
-6) Start the application by running nodemon App.js or npm start.
+6) Start the application by running nodemon app.js or npm start.
 
 Open your web browser and go to http://localhost:3000 to access the application.
 
